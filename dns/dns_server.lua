@@ -9,6 +9,7 @@ local settings = ttf.load(settingsLocation)
 local hosts = ttf.load(settings.HOST_FILE)
 
 settings.lAddr = modem.address
+ttf.save(settings, settingsLocation)
 
 local requests = {"DISCOVER", "REGISTER", "LOOKUP", "REVERSELOOKUP"}
 
@@ -170,5 +171,4 @@ end
 
 --TODO: Remove
 dns.start()
-dns.stop()
 return dns
