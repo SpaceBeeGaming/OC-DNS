@@ -6,10 +6,13 @@ local event = require("event")
 
 local settingsLocation = "/programs/data/DNS_SETTINGS.cfg"
 local settings = ttf.load(settingsLocation)
+local hosts = ttf.load(settings.HOST_FILE)
 
 settings.lAddr = modem.address
 
 local requests = {"DISCOVER", "REGISTER", "LOOKUP", "REVERSELOOKUP"}
+local regEx_string =
+  "\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])%.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b"
 
 --FUNCTIONS
 local internal = {}
@@ -30,12 +33,26 @@ local myEventHandlers =
 
 function myEventHandlers.DISCOVER(requester)
   --TEST
-  modem.send(requester.rAddr, requester.port, settings.lAddr)
+  modem.send(requester.rAddr, requester.port, "DNS", "DISCOVER", settings.lAddr)
   internal.common.logWrite("DNS | DISCOVER | " .. requester.rAddr:sub(1, 8))
 end
 
-function myEventHandlers.REGISTER(requester)
-  --TODO
+function myEventHandlers.REGISTER(requester, data)
+  --TEST
+  if (string.match(data, regEx_string)) then
+    if (hosts[data] == nil) then
+      hosts[data] = requester.rAddr
+      ttf.save(hosts, settings.HOST_FILE)
+      modem.send(requester.rAddr, requester.port, "DNS", "REGISTER", true)
+      internal.common.logWrite("DNS | REGISTER | " .. requester.rAddr:sub(1, 8) .. " | " .. data)
+    else
+      modem.send(requester.rAddr, requester.port, "DNS", "REGISTER", false, "IN_USE")
+      internal.common.logWrite("DNS | REGISTER | " .. requester.rAddr:sub(1, 8) .. " | failed: IN_USE")
+    end
+  else
+    modem.send(requester.rAddr, requester.port, "DNS", "REGISTER", false, "INVALID_PATTERN")
+    internal.common.logWrite("DNS | REGISTER | " .. requester.rAddr:sub(1, 8) .. " | failed: INVALID_PATTERN")
+  end
 end
 
 function myEventHandlers.LOOKUP(requester)
@@ -46,7 +63,7 @@ function myEventHandlers.REVERSELOOKUP(requester)
   --TODO
 end
 
-function eventHandler.tableEvent(_, _, rAddr, port, _, service, request)
+function eventHandler.tableEvent(_, _, rAddr, port, _, service, request, data)
   local e = {
     requester = {
       rAddr = rAddr,
@@ -55,7 +72,8 @@ function eventHandler.tableEvent(_, _, rAddr, port, _, service, request)
     header = {
       service = service,
       type = request
-    }
+    },
+    data = data or nil
   }
   return e
 end
@@ -66,15 +84,15 @@ function eventHandler.checkRequest(...)
     for i = 1, #requests do
       if (e.header.type == requests[i]) then
         --//print("test")
-        return e.header.type, e.requester
+        return e.header.type, e.requester, e.data
       end
     end
   end
 end
 
 function eventHandler.processEvent(...)
-  local type, requester = eventHandler.checkRequest(...)
-  myEventHandlers[type](requester)
+  local type, requester, data = eventHandler.checkRequest(...)
+  myEventHandlers[type](requester, data)
 end
 
 function internal.common.logWrite(text, screen)
