@@ -9,7 +9,7 @@ local settings = ttf.load(settingsLocation)
 
 settings.lAddr = modem.address
 
-local requests = {"DISCOVER"}
+local requests = {"DISCOVER", "REGISTER", "LOOKUP", "REVERSELOOKUP"}
 
 --FUNCTIONS
 local internal = {}
@@ -32,6 +32,18 @@ function myEventHandlers.DISCOVER(requester)
   --TEST
   modem.send(requester.rAddr, requester.port, settings.lAddr)
   internal.common.logWrite("DNS | DISCOVER | " .. requester.rAddr:sub(1, 8))
+end
+
+function myEventHandlers.REGISTER(requester)
+  --TODO
+end
+
+function myEventHandlers.LOOKUP(requester)
+  --TODO
+end
+
+function myEventHandlers.REVERSELOOKUP(requester)
+  --TODO
 end
 
 function eventHandler.tableEvent(_, _, rAddr, port, _, service, request)
