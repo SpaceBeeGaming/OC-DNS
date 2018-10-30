@@ -14,7 +14,6 @@ local requests = {"DISCOVER"}
 --FUNCTIONS
 local internal = {}
 internal.common = {}
-internal.dns = {}
 
 local eventHandler = {}
 local function unknownEvent()
@@ -32,11 +31,10 @@ local myEventHandlers =
 function myEventHandlers.DISCOVER(requester)
   --TEST
   modem.send(requester.rAddr, requester.port, settings.lAddr)
-  internal.logWrite("DNS | DISCOVER | " .. requester.rAddr:sub(1, 8))
+  internal.common.logWrite("DNS | DISCOVER | " .. requester.rAddr:sub(1, 8))
 end
 
 function eventHandler.tableEvent(_, _, rAddr, port, _, service, request)
-  --//print("event")
   local e = {
     requester = {
       rAddr = rAddr,
@@ -47,8 +45,6 @@ function eventHandler.tableEvent(_, _, rAddr, port, _, service, request)
       type = request
     }
   }
-  --//print(e.header.service)
-  --//print(e.header.type)
   return e
 end
 
@@ -65,9 +61,7 @@ function eventHandler.checkRequest(...)
 end
 
 function eventHandler.processEvent(...)
-  --//print(...)
   local type, requester = eventHandler.checkRequest(...)
-  --//print(type)
   myEventHandlers[type](requester)
 end
 
