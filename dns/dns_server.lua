@@ -63,14 +63,14 @@ function myEventHandlers.DISCOVER(requester)
   internal.common.logWrite("DNS | DISCOVER | " .. requester.rAddr:sub(1, 8))
 end
 
-function myEventHandlers.REGISTER(requester, data)
+function myEventHandlers.REGISTER(requester, ip)
   --TEST
-  if (checkIp(data)) then
-    if (hosts[data] == nil) then
-      hosts[data] = requester.rAddr
+  if (checkIp(ip)) then
+    if (hosts[ip] == nil) then
+      hosts[ip] = requester.rAddr
       ttf.save(hosts, settings.HOST_FILE)
       modem.send(requester.rAddr, requester.port, "DNS", "REGISTER", true)
-      internal.common.logWrite("DNS | REGISTER | " .. requester.rAddr:sub(1, 8) .. " | " .. data)
+      internal.common.logWrite("DNS | REGISTER | " .. requester.rAddr:sub(1, 8) .. " | " .. ip)
     else
       modem.send(requester.rAddr, requester.port, "DNS", "REGISTER", false, "IN_USE")
       internal.common.logWrite("DNS | REGISTER | " .. requester.rAddr:sub(1, 8) .. " | failed: IN_USE")
