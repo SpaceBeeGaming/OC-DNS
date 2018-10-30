@@ -11,14 +11,40 @@ local hosts = ttf.load(settings.HOST_FILE)
 settings.lAddr = modem.address
 
 local requests = {"DISCOVER", "REGISTER", "LOOKUP", "REVERSELOOKUP"}
-local regEx_string =
-  "\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])%.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b"
-
---FUNCTIONS
-local internal = {}
-internal.common = {}
 
 local eventHandler = {}
+local internal = {}
+internal.common = {}
+--FUNCTIONS
+
+local function checkIp(ip)
+  --Source: https://luacode.wordpress.com/2012/01/09/checking-ip-address-format-in-lua/
+  if not ip then
+    return false
+  end
+  local a, b, c, d = ip:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)$")
+  a = tonumber(a)
+  b = tonumber(b)
+  c = tonumber(c)
+  d = tonumber(d)
+  if (a == nil or b == nil or c == nil or d == nil) then
+    return false
+  end
+  if (a < 0 or a > 255) then
+    return false
+  end
+  if (b < 0 or b > 255) then
+    return false
+  end
+  if (c < 0 or c > 255) then
+    return false
+  end
+  if (d < 0 or d > 255) then
+    return false
+  end
+  return true
+end
+
 local function unknownEvent()
 end
 local myEventHandlers =
@@ -39,7 +65,7 @@ end
 
 function myEventHandlers.REGISTER(requester, data)
   --TEST
-  if (string.match(data, regEx_string)) then
+  if (checkIp(data)) then
     if (hosts[data] == nil) then
       hosts[data] = requester.rAddr
       ttf.save(hosts, settings.HOST_FILE)
