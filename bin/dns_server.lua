@@ -7,7 +7,7 @@ local event = require("event")
 local settingsLocation = "/programs/data/DNS_SETTINGS.cfg"
 local settings = ttf.load(settingsLocation)
 
-settings.lAddr = component.modem.address
+settings.lAddr = modem.address
 
 local requests = {"DISCOVER"}
 
@@ -29,9 +29,10 @@ local myEventHandlers =
   }
 )
 
-function myEventHandlers.DISCOVER()
-  --TODO
-  --//print("test")
+function myEventHandlers.DISCOVER(requester)
+  --TEST
+  modem.send(requester.rAddr, requester.port, settings.lAddr)
+  internal.logWrite("DNS | DISCOVER | " .. requester.rAddr:sub(1, 8))
 end
 
 function eventHandler.tableEvent(_, _, rAddr, port, _, service, request)
