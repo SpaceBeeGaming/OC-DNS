@@ -48,7 +48,7 @@ end
 
 local function unknownEvent()
 end
-local myEventHandlers =
+local dns_event =
   setmetatable(
   {},
   {
@@ -58,13 +58,13 @@ local myEventHandlers =
   }
 )
 
-function myEventHandlers.DISCOVER(requester)
+function dns_event.DISCOVER(requester)
   --TEST
   modem.send(requester.rAddr, requester.port, "DNS", "DISCOVER", settings.lAddr)
   internal.common.logWrite("DNS | DISCOVER | " .. requester.rAddr:sub(1, 8))
 end
 
-function myEventHandlers.REGISTER(requester, ip)
+function dns_event.REGISTER(requester, ip)
   --TEST
   if (checkIp(ip)) then
     if (hosts[ip] == nil) then
@@ -82,7 +82,7 @@ function myEventHandlers.REGISTER(requester, ip)
   end
 end
 
-function myEventHandlers.LOOKUP(requester, ip)
+function dns_event.LOOKUP(requester, ip)
   --TEST
   local addr = hosts[ip]
   if addr then
@@ -94,7 +94,7 @@ function myEventHandlers.LOOKUP(requester, ip)
   end
 end
 
-function myEventHandlers.RLOOKUP(requester, addr)
+function dns_event.RLOOKUP(requester, addr)
   --TEST
   for k, v in pairs(hosts) do
     if (v == addr) then
@@ -136,7 +136,7 @@ end
 
 function eventHandler.processEvent(...)
   local type, requester, data = eventHandler.checkRequest(...)
-  myEventHandlers[type](requester, data)
+  dns_event[type](requester, data)
 end
 
 function internal.common.logWrite(text, screen)
