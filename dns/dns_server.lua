@@ -81,8 +81,16 @@ function myEventHandlers.REGISTER(requester, data)
   end
 end
 
-function myEventHandlers.LOOKUP(requester)
-  --TODO
+function myEventHandlers.LOOKUP(requester, ip)
+  --TEST
+  local addr = hosts[ip]
+  if addr then
+    modem.send(requester.rAddr, requester.port, "DNS", "LOOKUP", addr)
+    internal.common.logWrite("DNS | LOOKUP | " .. requester.rAddr:sub(1, 8) .. " | " .. ip)
+  else
+    modem.send(requester.rAddr, requester.port, "DNS", "LOOKUP", false, "NOT_FOUND")
+    internal.common.logWrite("DNS | LOOKUP | " .. requester.rAddr:sub(1, 8) .. " | failed: NOT_FOUND")
+  end
 end
 
 function myEventHandlers.REVERSELOOKUP(requester, addr)
