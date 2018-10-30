@@ -85,8 +85,17 @@ function myEventHandlers.LOOKUP(requester)
   --TODO
 end
 
-function myEventHandlers.REVERSELOOKUP(requester)
-  --TODO
+function myEventHandlers.REVERSELOOKUP(requester, addr)
+  --TEST
+  for k, v in pairs(hosts) do
+    if (v == addr) then
+      modem.send(requester.rAddr, requester.port, "DNS", "REVERSELOOKUP", k)
+      internal.common.logWrite("DNS | LOOKUP | " .. requester.rAddr:sub(1, 8) .. " | " .. k)
+      break
+    end
+  end
+  modem.send(requester.rAddr, requester.port, "DNS", "REVERSELOOKUP", false, "NOT_FOUND")
+  internal.common.logWrite("DNS | LOOKUP | " .. requester.rAddr:sub(1, 8) .. " | failed: NOT_FOUND")
 end
 
 function eventHandler.tableEvent(_, _, rAddr, port, _, service, request, data)
