@@ -9,6 +9,7 @@ local settings = ttf.load(settingsLocation)
 local hosts = ttf.load(settings.HOST_FILE)
 
 settings.lAddr = modem.address
+ttf.save(settings, settingsLocation)
 
 local requests = {"DISCOVER", "REGISTER", "LOOKUP", "RLOOKUP"}
 
@@ -81,10 +82,13 @@ function dns_event.REGISTER(requester, ip)
 end
 
 function dns_event.LOOKUP(requester, ip)
+
   local addr = hosts[ip]
   if addr then
     modem.send(requester.rAddr, requester.port, "DNS", "LOOKUP", addr)
     internal.common.logWrite("DNS | LOOKUP | " .. requester.rAddr:sub(1, 8) .. " | " .. addr:sub(1, 8))
+
+
   else
     modem.send(requester.rAddr, requester.port, "DNS", "LOOKUP", false, "NOT_FOUND")
     internal.common.logWrite("DNS | LOOKUP | " .. requester.rAddr:sub(1, 8) .. " | failed: NOT_FOUND")
@@ -96,6 +100,7 @@ function dns_event.RLOOKUP(requester, addr)
     if (v == addr) then
       modem.send(requester.rAddr, requester.port, "DNS", "RLOOKUP", k)
       internal.common.logWrite("DNS | RLOOKUP | " .. requester.rAddr:sub(1, 8) .. " | " .. k)
+
       return
     end
   end
