@@ -59,13 +59,11 @@ local dns_event =
 )
 
 function dns_event.DISCOVER(requester)
-  --TEST
   modem.send(requester.rAddr, requester.port, "DNS", "DISCOVER", settings.lAddr)
   internal.common.logWrite("DNS | DISCOVER | " .. requester.rAddr:sub(1, 8))
 end
 
 function dns_event.REGISTER(requester, ip)
-  --TEST
   if (checkIp(ip)) then
     if (hosts[ip] == nil) then
       hosts[ip] = requester.rAddr
@@ -83,7 +81,6 @@ function dns_event.REGISTER(requester, ip)
 end
 
 function dns_event.LOOKUP(requester, ip)
-  --TEST
   local addr = hosts[ip]
   if addr then
     modem.send(requester.rAddr, requester.port, "DNS", "LOOKUP", addr)
@@ -95,12 +92,11 @@ function dns_event.LOOKUP(requester, ip)
 end
 
 function dns_event.RLOOKUP(requester, addr)
-  --TEST
   for k, v in pairs(hosts) do
     if (v == addr) then
       modem.send(requester.rAddr, requester.port, "DNS", "RLOOKUP", k)
       internal.common.logWrite("DNS | RLOOKUP | " .. requester.rAddr:sub(1, 8) .. " | " .. k)
-      break
+      return
     end
   end
   modem.send(requester.rAddr, requester.port, "DNS", "RLOOKUP", false, "NOT_FOUND")
@@ -147,6 +143,7 @@ function internal.common.logWrite(text, screen)
   end
   if (logFile) then
     logFile:write(os.date() .. " | " .. text .. "\n")
+    logFile:close()
   end
 end
 
