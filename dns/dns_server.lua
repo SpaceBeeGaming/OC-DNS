@@ -158,7 +158,7 @@ function dns.start()
   else
     modem.open(settings.port)
     event.listen("modem_message", eventHandler.processEvent)
-    internal.common.logWrite("Started DNS on port: " .. settings.port, true)
+    internal.common.logWrite("DNS | START | port: " .. settings.port, true)
   end
 end
 
@@ -166,7 +166,7 @@ function dns.stop()
   ttf.save(settings, settingsLocation)
   event.ignore("modem_message", eventHandler.processEvent)
   modem.close(settings.port)
-  internal.common.logWrite("Stopped DNS on port: " .. settings.port, true)
+  internal.common.logWrite("DNS | STOP | port: " .. settings.port, true)
 end
 
 --TODO: Remove
