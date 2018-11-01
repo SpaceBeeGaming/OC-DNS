@@ -1,2 +1,2 @@
-# OC-Script-Collection
-Collection of scripts for OpenComputers Minecraft mod.
+# OC-DNS
+Sort of "DNS" Server.
