@@ -38,3 +38,72 @@ function internal.bcSend(details, data)
   modem.broadcast(settings.port, details[1], details[2], data)
 end
 
+local dns = {}
+
+function dns.discover()
+  --TEST
+  local details = {"DNS", "DISCOVER"}
+  internal.bcSend(details)
+  local pReply = event.pull(1, "modem_message") --_, rAddr, port, _, service, request, response:value, response:reason
+  local reply
+  if (pReply) then
+    reply = internal.tableReply(table.unpack(pReply))
+    if (internal.checkDetails(details, reply)) then
+      if (reply.response.value) then
+        settings.DNS_SERVER = reply.response.value
+        ttf.save(settings, settingsLocation)
+        return reply.response.value
+      end
+    else
+      return reply.response.value, reply.response.reason
+    end
+  else
+    return false, "TIMED_OUT"
+  end
+end
+
+function internal.send(details, data)
+  if (settings.DNS_SERVER) then
+    modem.send(settings.DNS_SERVER, settings.port, details[1], details[2], data)
+  else
+    dns.discover()
+  end
+end
+
+function dns.register(ip)
+  --TEST
+  local details = {"DNS", "REGISTER"}
+  internal.send(details, ip)
+  local pReply = event.pull(1, "modem_message")
+  local reply
+  if (pReply) then
+    reply = internal.tableReply(table.unpack(pReply))
+    if (internal.checkDetails(details, reply)) then
+      return reply.response.value, reply.response.reason
+    end
+  else
+    return false, "TIMED_OUT"
+  end
+end
+
+function dns.lookup()
+  --TODO
+end
+
+function dns.rlookup()
+  --TODO
+end
+
+function dns.start()
+  if (modem.open(settings.port)) then
+    return true
+  else
+    return false, "IN_USE"
+  end
+end
+
+function dns.stop()
+  modem.close(settings.port)
+end
+
+return dns
