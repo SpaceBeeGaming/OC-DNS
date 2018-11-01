@@ -82,13 +82,10 @@ function dns_event.REGISTER(requester, ip)
 end
 
 function dns_event.LOOKUP(requester, ip)
-
   local addr = hosts[ip]
   if addr then
     modem.send(requester.rAddr, requester.port, "DNS", "LOOKUP", addr)
     internal.common.logWrite("DNS | LOOKUP | " .. requester.rAddr:sub(1, 8) .. " | " .. addr:sub(1, 8))
-
-
   else
     modem.send(requester.rAddr, requester.port, "DNS", "LOOKUP", false, "NOT_FOUND")
     internal.common.logWrite("DNS | LOOKUP | " .. requester.rAddr:sub(1, 8) .. " | failed: NOT_FOUND")
@@ -152,9 +149,7 @@ function internal.common.logWrite(text, screen)
   end
 end
 
-local dns = {}
-
-function dns.start()
+function start()
   if (modem.isOpen(settings.port)) then
     print("Port: '" .. settings.port .. "' already in use.")
   else
@@ -164,13 +159,16 @@ function dns.start()
   end
 end
 
-function dns.stop()
+function stop()
   ttf.save(settings, settingsLocation)
   event.ignore("modem_message", eventHandler.processEvent)
   modem.close(settings.port)
   internal.common.logWrite("DNS | STOP | port: " .. settings.port, true)
 end
 
---TODO: Remove
-dns.start()
-return dns
+--Shutup luacheck.
+local debug = false
+if debug then
+  start()
+  stop()
+end
