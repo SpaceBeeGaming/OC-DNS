@@ -6,18 +6,35 @@ local ttf = require("tableToFile")
 local settingsLocation = "/usr/data/settings.cfg"
 local settings = ttf.load(settingsLocation)
 
-modem.open(settings.port)
-modem.broadcast(settings.port, "DNS", "DISCOVER")
-local pReply = event.pull(1, "modem_message") --_, rAddr, port, _, service, request, response
+--modem.open(settings.port)
+--modem.broadcast(settings.port, "DNS", "DISCOVER")
 
-local requests = {"DISCOVER"}
-local reply = {
-  rAddr = pReply[2],
-  port = pReply[3],
-  service = pReply[5],
-  request = pReply[6],
-  response = {
-    value = pReply[7],
-    reason = pReply[8]
+--local requests = {"DISCOVER"}
+local internal = {}
+
+function internal.tableReply(_, rAddr, port, _, service, request, response, reason)
+  local reply = {
+    rAddr = rAddr,
+    port = port,
+    service = service,
+    request = request,
+    response = {
+      value = response,
+      reason = reason or nil
+    }
   }
-}
+  return reply
+end
+
+function internal.checkDetails(details, reply)
+  if (details[1] == reply.service and details[2] == reply.request) then
+    return true
+  else
+    return false
+  end
+end
+
+function internal.bcSend(details, data)
+  modem.broadcast(settings.port, details[1], details[2], data)
+end
+
