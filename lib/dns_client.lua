@@ -34,16 +34,12 @@ function internal.checkDetails(details, reply)
   end
 end
 
-function internal.bcSend(details, data)
-  modem.broadcast(settings.port, details[1], details[2], data)
-end
-
 local dns = {}
 
 function dns.discover()
   --TEST
   local details = {"DNS", "DISCOVER"}
-  internal.bcSend(details)
+  modem.broadcast(settings.port, details[1], details[2])
   local pReply = event.pull(1, "modem_message") --_, rAddr, port, _, service, request, response:value, response:reason
   local reply
   if (pReply) then
