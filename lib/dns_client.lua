@@ -6,13 +6,9 @@ local ttf = require("tableToFile")
 local settingsLocation = "/dns/data/DNS_SETTINGS.cfg"
 local settings = ttf.load(settingsLocation)
 
---modem.open(settings.port)
---modem.broadcast(settings.port, "DNS", "DISCOVER")
-
---local requests = {"DISCOVER"}
 local internal = {}
 
-function internal.tableReply(_, rAddr, port, _, service, request, response, reason)
+function internal.tableReply(rAddr, port, service, request, response, reason)
   local reply = {
     rAddr = rAddr,
     port = port,
@@ -37,13 +33,13 @@ end
 local dns_client = {}
 
 function dns_client.discover()
-  --TEST
   local details = {"DNS", "DISCOVER"}
   modem.broadcast(settings.port, details[1], details[2])
-  local pReply = event.pull(1, "modem_message") --_, rAddr, port, _, service, request, response:value, response:reason
+  local _, _, rAddr, port, _, service, request, value, reason = event.pull(1, "modem_message")
   local reply
-  if (pReply) then
-    reply = internal.tableReply(table.unpack(pReply))
+
+  if (rAddr) then
+    reply = internal.tableReply(rAddr, port, service, request, value, reason)
     if (internal.checkDetails(details, reply)) then
       if (reply.response.value) then
         settings.DNS_SERVER = reply.response.value
@@ -67,12 +63,11 @@ function internal.send(details, data)
 end
 
 function internal.request(details, data)
-  --TEST
   internal.send(details, data)
-  local pReply = event.pull(1, "modem_message")
+  local _, _, rAddr, port, _, service, request, value, reason = event.pull(1, "modem_message")
   local reply
-  if (pReply) then
-    reply = internal.tableReply(table.unpack(pReply))
+  if (rAddr) then
+    reply = internal.tableReply(rAddr, port, service, request, value, reason)
     if (internal.checkDetails(details, reply)) then
       return reply.response.value, reply.response.reason
     end
@@ -82,19 +77,16 @@ function internal.request(details, data)
 end
 
 function dns_client.register(ip)
-  --TEST
   local details = {"DNS", "REGISTER"}
   return internal.request(details, ip)
 end
 
 function dns_client.lookup(ip)
-  --TEST
   local details = {"DNS", "LOOKUP"}
   return internal.request(details, ip)
 end
 
 function dns_client.rlookup(addr)
-  --TEST
   local details = {"DNS", "RLOOKUP"}
   return internal.request(details, addr)
 end
