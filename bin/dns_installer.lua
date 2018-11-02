@@ -7,6 +7,7 @@ local files = {
   client = {"lib/dns_client.lua", "lib/tableToFile.lua"}
 }
 
+local update = fs.exists("/dns")
 print("Choose what to install.")
 print("[1] Server")
 print("[2] Client")
@@ -21,11 +22,12 @@ local settings = {}
 if (tostring(input) == "1") then
   fs.makeDirectory("/dns/bin")
   fs.makeDirectory("/dns/lib")
+  fs.makeDirectory("/dns/data")
   files = files.server
   settings.LOG_FILE = "/dns/DNS_LOG.log"
-  settings.HOST_FILE = "/dns/HOSTS.log"
+  settings.HOST_FILE = "/dns/data/HOSTS.txt"
 
-  print("Port for DNS communication (default:'9999')")
+  io.write("Port for DNS communication (default:'9999'): ")
   port = io.read()
   if port == "" then
     port = nil
@@ -34,8 +36,9 @@ if (tostring(input) == "1") then
 elseif (tostring(input) == "2") then
   files = files.client
   fs.makeDirectory("/dns/lib")
+  fs.makeDirectory("/dns/data")
 
-  print("Port for DNS communication (default:'9999')")
+  io.write("Port for DNS communication (default:'9999'): ")
   port = io.read()
   if port == "" then
     port = nil
@@ -46,24 +49,36 @@ else
 end
 
 --fs.makeDirectory("/dns")
-local settingsFile = io.open("/dns/data/DNS_SETTINGS.cfg", "w")
-settingsFile:write(serialization.serialize(settings))
-settingsFile:close()
+if not update then
+  local settingsFile = io.open("/dns/data/DNS_SETTINGS.cfg", "w")
+  settingsFile:write(serialization.serialize(settings))
+  settingsFile:close()
+end
 
 for i = 1, #files do
   os.execute("wget -f " .. dlURL .. files[i] .. " /dns/" .. files[i])
 end
 if (tostring(input) == "1") then
-  local shellFile = io.open(os.getenv("HOME") .. "/.shrc", "a")
-  shellFile:write("/dns/bin/dns_server_starter.lua\n")
+  if not update then
+    local hostFile = io.open("/dns/data/HOSTS.txt", "a")
+    hostFile:write("{}")
+    hostFile:close()
+
+    local shellFile = io.open(os.getenv("HOME") .. "/.shrc", "a")
+    shellFile:write("/dns/bin/dns_server_starter.lua\n")
+    shellFile:close()
+  end
+
   io.write("Installation finished. Do you want to start the server: [Y/n]: ")
   if (io.read():lower() == "n") then
     return
   else
     os.execute("/dns/bin/dns_server_starter.lua")
     os.execute("rc dns enable")
-    os.execute("rc") --? Is this needed?
   end
 else
+  local shellFile = io.open(os.getenv("HOME") .. "/.shrc", "a")
+  shellFile:write("ln /dns/lib /usr/lib\n")
+  shellFile:close()
   print("Installation finished.")
 end
