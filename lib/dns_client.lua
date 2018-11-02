@@ -62,7 +62,7 @@ function internal.send(details, data)
   if (settings.DNS_SERVER) then
     modem.send(settings.DNS_SERVER, settings.port, details[1], details[2], data)
   else
-    dns.discover()
+    modem.send(dns.discover(), settings.port, details[1], details[2], data)
   end
 end
 
@@ -109,6 +109,7 @@ end
 
 function dns.stop()
   modem.close(settings.port)
+  return true
 end
 
 return dns
