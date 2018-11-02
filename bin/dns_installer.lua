@@ -46,12 +46,12 @@ else
 end
 
 --fs.makeDirectory("/dns")
-local settingsFile = io.open("/dns/DNS_SETTINGS.cfg", "w")
+local settingsFile = io.open("/dns/data/DNS_SETTINGS.cfg", "w")
 settingsFile:write(serialization.serialize(settings))
 settingsFile:close()
 
 for i = 1, #files do
-  os.execute("wget " .. dlURL .. files[i] .. " /dns/" .. files[i])
+  os.execute("wget -f " .. dlURL .. files[i] .. " /dns/" .. files[i])
 end
 if (tostring(input) == "1") then
   local shellFile = io.open(os.getenv("HOME") .. "/.shrc", "a")
