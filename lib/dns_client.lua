@@ -85,16 +85,22 @@ function internal.request(details, data)
   end
 end
 
-function dns.lookup()
-  --TODO
 function dns.register(ip)
   --TEST
   local details = {"DNS", "REGISTER"}
   return internal.request(details, ip)
 end
 
-function dns.rlookup()
-  --TODO
+function dns.lookup(ip)
+  --TEST
+  local details = {"DNS", "LOOKUP"}
+  return internal.request(details, ip)
+end
+
+function dns.rlookup(addr)
+  --TEST
+  local details = {"DNS", "RLOOKUP"}
+  return internal.request(details, addr)
 end
 
 function dns.start()
