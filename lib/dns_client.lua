@@ -34,9 +34,9 @@ function internal.checkDetails(details, reply)
   end
 end
 
-local dns = {}
+local dns_client = {}
 
-function dns.discover()
+function dns_client.discover()
   --TEST
   local details = {"DNS", "DISCOVER"}
   modem.broadcast(settings.port, details[1], details[2])
@@ -62,7 +62,7 @@ function internal.send(details, data)
   if (settings.DNS_SERVER) then
     modem.send(settings.DNS_SERVER, settings.port, details[1], details[2], data)
   else
-    modem.send(dns.discover(), settings.port, details[1], details[2], data)
+    modem.send(dns_client.discover(), settings.port, details[1], details[2], data)
   end
 end
 
@@ -81,25 +81,25 @@ function internal.request(details, data)
   end
 end
 
-function dns.register(ip)
+function dns_client.register(ip)
   --TEST
   local details = {"DNS", "REGISTER"}
   return internal.request(details, ip)
 end
 
-function dns.lookup(ip)
+function dns_client.lookup(ip)
   --TEST
   local details = {"DNS", "LOOKUP"}
   return internal.request(details, ip)
 end
 
-function dns.rlookup(addr)
+function dns_client.rlookup(addr)
   --TEST
   local details = {"DNS", "RLOOKUP"}
   return internal.request(details, addr)
 end
 
-function dns.start()
+function dns_client.start()
   if (modem.open(settings.port)) then
     return true
   else
@@ -107,9 +107,9 @@ function dns.start()
   end
 end
 
-function dns.stop()
+function dns_client.stop()
   modem.close(settings.port)
   return true
 end
 
-return dns
+return dns_client
