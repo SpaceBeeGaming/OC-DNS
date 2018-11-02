@@ -4,7 +4,7 @@ local modem = component.modem
 local ttf = require("tableToFile")
 local event = require("event")
 
-local settingsLocation = "/programs/data/DNS_SETTINGS.cfg"
+local settingsLocation = "/dns/data/DNS_SETTINGS.cfg"
 local settings = ttf.load(settingsLocation)
 local hosts = ttf.load(settings.HOST_FILE)
 

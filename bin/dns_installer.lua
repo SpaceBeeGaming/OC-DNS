@@ -54,7 +54,7 @@ for i = 1, #files do
   os.execute("wget " .. dlURL .. files[i] .. " /dns/" .. files[i])
 end
 if (tostring(input) == "1") then
-  local shellFile = io.open("$HOME/.shrc", "a")
+  local shellFile = io.open(os.getenv("HOME") .. "/.shrc", "a")
   shellFile:write("/dns/bin/dns_server_starter.lua\n")
   io.write("Installation finished. Do you want to start the server: [Y/n]: ")
   if (io.read():lower() == "n") then

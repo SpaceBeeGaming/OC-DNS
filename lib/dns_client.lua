@@ -3,7 +3,7 @@ local modem = component.modem
 local event = require("event")
 local ttf = require("tableToFile")
 
-local settingsLocation = "/usr/data/settings.cfg"
+local settingsLocation = "/dns/data/settings.cfg"
 local settings = ttf.load(settingsLocation)
 
 --modem.open(settings.port)
