@@ -70,10 +70,9 @@ function internal.send(details, data)
   end
 end
 
-function dns.register(ip)
+function internal.request(details, data)
   --TEST
-  local details = {"DNS", "REGISTER"}
-  internal.send(details, ip)
+  internal.send(details, data)
   local pReply = event.pull(1, "modem_message")
   local reply
   if (pReply) then
@@ -88,6 +87,10 @@ end
 
 function dns.lookup()
   --TODO
+function dns.register(ip)
+  --TEST
+  local details = {"DNS", "REGISTER"}
+  return internal.request(details, ip)
 end
 
 function dns.rlookup()
