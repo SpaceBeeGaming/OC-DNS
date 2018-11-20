@@ -20,6 +20,9 @@ internal.common = {}
 
 local function checkIp(ip)
   --Source: https://luacode.wordpress.com/2012/01/09/checking-ip-address-format-in-lua/
+  if (settings.formalAddr == false) then
+    return true
+  end
   if not ip then
     return false
   end

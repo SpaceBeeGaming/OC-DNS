@@ -33,6 +33,12 @@ if (tostring(input) == "1") then
     port = nil
   end
   settings.port = tonumber(port) or 9999
+  io.write("Enforce 'ipv4' addresses? [Y/n]: ")
+  if (io.read():lower() == "y") then
+    settings.formalAddr = true
+  else
+    settings.formalAddr = false
+  end
 elseif (tostring(input) == "2") then
   files = files.client
   fs.makeDirectory("/dns/lib")
@@ -75,10 +81,12 @@ if (tostring(input) == "1") then
   else
     os.execute("/dns/bin/dns_server_starter.lua")
     os.execute("rc dns enable")
+    os.execute("rc dns start")
   end
 else
   local shellFile = io.open(os.getenv("HOME") .. "/.shrc", "a")
   shellFile:write("ln /dns/lib /usr/lib\n")
   shellFile:close()
+  os.execute("ln /dns/lib /usr/lib")
   print("Installation finished.")
 end
