@@ -58,7 +58,12 @@ function internal.send(details, data)
   if (settings.DNS_SERVER) then
     modem.send(settings.DNS_SERVER, settings.port, details[1], details[2], data)
   else
-    modem.send(dns_client.discover(), settings.port, details[1], details[2], data)
+    local tmpAddr = dns_client.discover()
+    if (tmpAddr) then
+      modem.send(tmpAddr, settings.port, details[1], details[2], data)
+    else
+      return false, "TIMED_OUT"
+    end
   end
 end
 
