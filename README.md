@@ -3,6 +3,10 @@ A sort of "DNS" server/client for OpenComputers.
 
 Allows the mapping of "ipv4" addresses to modems. With to goal of making crossdevice communication easier.
 
+## Installation
+run `wget https://raw.githubusercontent.com/SpaceBeeGaming/OC-DNS/master/bin/dns_installer.lua` and folloq the instructions.
+(More deatails in the wiki)
+
 ## Wiki
 Wiki Here: https://github.com/SpaceBeeGaming/OC-DNS/wiki
 
