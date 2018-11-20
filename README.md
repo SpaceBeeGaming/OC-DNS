@@ -12,3 +12,5 @@ Wiki Here: https://github.com/SpaceBeeGaming/OC-DNS/wiki
 
 ## Contributing
 If you find bugs open a issue or if you feel competent, fix it yourself and make a pull request.
+
+If you have a question open a issue and add the "Question" label.
